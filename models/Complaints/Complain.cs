@@ -25,6 +25,7 @@ namespace complainSystem.models.Complains
         [Required]
 
         public int  CategoryId { get; set; }
+        
         // public string ComplainPriority { get; set; }
         // public string? ComplainImage { get; set; }
         // public string? ComplainLocation { get; set; }

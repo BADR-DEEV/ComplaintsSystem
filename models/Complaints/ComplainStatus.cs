@@ -14,6 +14,8 @@ namespace complainSystem.models
         Open = 1,
         Closed = 2,
         Pending = 3,
+        deleted = 4,
+        
 
 
 

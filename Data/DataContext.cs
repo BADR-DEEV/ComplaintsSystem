@@ -3,10 +3,13 @@ using complainSystem.models.Complains;
 using ComplainSystem.models;
 using complainSystem.models;
 using Microsoft.EntityFrameworkCore;
+using complainSystem.models.Users;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ComplainSystem.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -20,7 +23,19 @@ namespace ComplainSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<IdentityUser>().Ignore(c => c.AccessFailedCount)
+                                               .Ignore(c => c.LockoutEnabled)
+                                               .Ignore(c => c.NormalizedEmail).
+                                               Ignore(c => c.NormalizedUserName)
+                                               .Ignore(c => c.PhoneNumberConfirmed)
+                                               .Ignore(c => c.TwoFactorEnabled)
+                                               .Ignore(c => c.ConcurrencyStamp)
+                                               .Ignore(c => c.EmailConfirmed)
+                                               .Ignore(c => c.LockoutEnd).Ignore(c => c.PasswordHash)
+                                               .Ignore(c => c.SecurityStamp).Ignore(c => c.PhoneNumber);
 
+            modelBuilder.Entity<IdentityUser>().ToTable("Users");
             modelBuilder.Entity<Complain>(entity =>
             {
                 entity.HasData(new Complain
@@ -44,15 +59,16 @@ namespace ComplainSystem.Data
                     CategoryId = 2
 
                 },
-            
-            new Complain {
-                Id = 3 ,
+
+            new Complain
+            {
+                Id = 3,
                 ComplainTitle = "assult",
                 ComplainDescription = "someone stole my bike",
                 ComplainDateTime = DateTime.Now,
                 ComplainStatus = ComplainStatus.Open,
                 CategoryId = 3
-                
+
             }
                 );
 
@@ -77,6 +93,27 @@ namespace ComplainSystem.Data
                         Name = "assult",
                         Description = "Assault is an act of inflicting physical harm or unwanted physical contact upon a person or, in some specific legal definitions, a threat or attempt to commit such an action."
                     }
+            );
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN",
+                    ConcurrencyStamp = "1",
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER",
+                    ConcurrencyStamp = "2",
+                },
+                new IdentityRole
+                {
+                    Name = "SuperAdmin",
+                    NormalizedName = "SUPERADMIN",
+                    ConcurrencyStamp = "3",
+                }
             );
 
         }

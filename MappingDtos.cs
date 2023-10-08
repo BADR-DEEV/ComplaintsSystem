@@ -6,6 +6,7 @@ using AutoMapper;
 using complainSystem.models;
 using complainSystem.models.ComplainDto;
 using complainSystem.models.Complains;
+using complainSystem.models.Users;
 
 
 namespace complainSystem
@@ -18,6 +19,8 @@ namespace complainSystem
             CreateMap<Complain, AddComplainDto>();
             CreateMap<Complain, UpdateComplainDto>();
             CreateMap<AddComplainDto, Complain>();
+            CreateMap<UserRegister, User>();
+            CreateMap<User, UserRegister>();
 
 
             // CreateMap<UpdateCharacterDto, Character>();

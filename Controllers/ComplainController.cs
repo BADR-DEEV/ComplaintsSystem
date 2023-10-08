@@ -49,6 +49,12 @@ namespace complainSystem.Controllers
         {
             return Ok(await _complainService.AddComplaint(complain));
         }
+        [HttpPut]
+        [Route("UpdateComplain/{id}")]
+        public async Task<ActionResult<ServiceResponse<UpdateComplainDto>>> UpdateComplain(UpdateComplainDto complain)
+        {
+            return Ok(await _complainService.UpdateComplaint(complain));
+        }
         
     }
 }
