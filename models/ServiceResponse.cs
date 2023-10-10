@@ -8,10 +8,12 @@ namespace complainSystem.models
     public class ServiceResponse<T>
     {
      
-        public T? Data {get; set;}
+        public T? Data {get; set;} = default;
         public int StatusCode { get; set; }
         public string Message { get; set; } =string.Empty;
         public bool Success { get; set; } = true;
+        public List<string>? ValidationMessages { get; set; } = new List<string>();
+        public string? Token { get; set; }
         
         // public Exception Exception { get; set; }
         // public bool IsError { get; set; }

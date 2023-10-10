@@ -11,10 +11,8 @@ namespace complainSystem.models.ComplainDto
 {
     public class AddComplainDto
     {
-        [Required]
-        [StringLength(100)]
-        public string ComplainTitle { get; set; } = string.Empty;
-        [StringLength(500)]
+
+        public string? ComplainTitle { get; set; } = string.Empty;
         public string ComplainDescription { get; set; } = string.Empty;
         public DateTime ComplainDateTime { get; set; } = DateTime.Now;
         public ComplainStatus ComplainStatus { get; set; } = ComplainStatus.Open;

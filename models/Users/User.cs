@@ -13,7 +13,6 @@ namespace complainSystem.models.Users
   
      
       
-        [Required]
         public string? Address { get; set; } = string.Empty;
 
 
@@ -25,6 +24,7 @@ namespace complainSystem.models.Users
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public List<Complain>? Complaints { get; set; }
+        
 
     }
 }

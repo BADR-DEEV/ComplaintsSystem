@@ -12,6 +12,7 @@ namespace complainSystem.Services.AuthenticationService
         Task<ServiceResponse<User>> RegisterUser(UserRegister authenticateUser , string role);
         Task<ServiceResponse<User>> LoginUser(UserLogin authenticateUser);
         Task<ServiceResponse<User>> Logout();
+        string RefreshToken(UserLogin authenticateUser);
         
     }
 }

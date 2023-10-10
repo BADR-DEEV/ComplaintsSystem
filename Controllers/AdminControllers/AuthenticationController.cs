@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using complainSystem.Helpers;
 using complainSystem.models;
 using complainSystem.models.Users;
 using complainSystem.Services.AuthenticationService;
@@ -26,22 +27,8 @@ namespace complainSystem.Controllers.AdminControllers
         [Route("RegisterUser")]
         public async Task<ActionResult<ServiceResponse<User>>> RegisterUser([FromBody] UserRegister authenticateUser, string role)
         {
-            ServiceResponse<User> response = await _AuthenticateUserService.RegisterUser(authenticateUser, role);
-           
-            switch (response.StatusCode)
-            {
-                case 500:
-                    return StatusCode(500, response);
-
-                case 400:
-                    return BadRequest(response);
-                case 201:
-                    return Created("", response);
-
-                default:
-                    return BadRequest(response);
-            }
-
+            Helpers<User> helper = new();
+            return helper.HandleResponse(await _AuthenticateUserService.RegisterUser(authenticateUser, role));
 
         }
 
@@ -49,21 +36,8 @@ namespace complainSystem.Controllers.AdminControllers
         [Route("LoginUser")]
         public async Task<ActionResult<ServiceResponse<User>>> LoginUser([FromBody] UserLogin authenticateUser)
         {
-            ServiceResponse<User> response = await _AuthenticateUserService.LoginUser(authenticateUser);
-           
-            switch (response.StatusCode)
-            {
-                case 500:
-                    return StatusCode(500, response);
-
-                case 400:
-                    return BadRequest(response);
-                case 200:
-                    return Ok(response);
-
-                default:
-                    return BadRequest(response);
-            }
+            Helpers<User> helper = new();
+            return helper.HandleResponse(await _AuthenticateUserService.LoginUser(authenticateUser));
 
         }
     }

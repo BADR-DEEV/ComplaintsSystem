@@ -1,31 +1,31 @@
-using complainSystem;
+using System.Reflection;
 using complainSystem.models.Users;
 using complainSystem.Services.AuthenticationService;
 using complainSystem.Services.ComplainService;
 using ComplainSystem.Data;
 using ComplainSystem.Services.CategoryService;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 
 
 // using ComplainSystem.Services.CategoryService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddDbContext<DataContext>(opt =>
 {
-    
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
-// builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt => opt.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DataContext>();
+
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
     {
@@ -38,18 +38,33 @@ builder.Services
         options.Password.RequireLowercase = false;
     }).AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
+
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-});
+}).AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateActor = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        RequireExpirationTime = true,
+        // ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
+        // IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+}
+);
 
 builder.Services.AddAutoMapper(typeof(Program));
-
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IComplainService, ComplainService>();
-builder.Services.AddScoped<IAuthenticateUserService , AuthenticateUserService>();
+builder.Services.AddScoped<IAuthenticateUserService, AuthenticateUserService>();
 var app = builder.Build();
 
 

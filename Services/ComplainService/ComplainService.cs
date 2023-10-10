@@ -6,7 +6,9 @@ using AutoMapper;
 using complainSystem.models;
 using complainSystem.models.ComplainDto;
 using complainSystem.models.Complains;
+using complainSystem.Validations;
 using ComplainSystem.Data;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace complainSystem.Services.ComplainService
@@ -26,6 +28,22 @@ namespace complainSystem.Services.ComplainService
         {
             ServiceResponse<Complain> serviceResponse = new ServiceResponse<Complain>();
             Complain complaint = _mapper.Map<Complain>(PostedComplaint);
+
+
+            //Validating the request before adding the complaint
+            //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            var validationResult = new AddComplainDtoValidation().Validate(complaint);
+            var IsValid = validationResult.IsValid;
+            var Errors = validationResult.Errors;
+
+            ReqguestValidationGeneric<Complain> req = new(IsValid, complaint, Errors);
+            if (!IsValid)
+            {
+                req.serviceResponse.StatusCode = 400;
+                req.serviceResponse.Success = false;
+                return req.serviceResponse;
+            }
+            //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
             try
             {
@@ -162,6 +180,27 @@ namespace complainSystem.Services.ComplainService
 
         public async Task<ServiceResponse<Complain>> UpdateComplaint(UpdateComplainDto updatedComplaint)
         {
+
+            //Validating the request before updating the complaint
+            //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            var complain = _mapper.Map<Complain>(updatedComplaint);
+            var validationResult = new UpdateComplainDtoValidation().Validate(updatedComplaint);
+            var IsValid = validationResult.IsValid;
+            var Errors = validationResult.Errors;
+
+            ReqguestValidationGeneric<Complain> req = new(IsValid, complain, Errors);
+            if (!IsValid)
+            {
+                req.serviceResponse.StatusCode = 400;
+                req.serviceResponse.Success = false;
+                return req.serviceResponse;
+            }
+            //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
             ServiceResponse<Complain> serviceResponse = new ServiceResponse<Complain>();
 
             try
@@ -173,7 +212,7 @@ namespace complainSystem.Services.ComplainService
                     complainToUpdate.ComplainDescription = updatedComplaint.ComplainDescription;
                     complainToUpdate.CategoryId = updatedComplaint.CategoryId;
                     complainToUpdate.Category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == updatedComplaint.CategoryId);
-                    if ( complainToUpdate.Category == null || complainToUpdate.CategoryId == 0 )
+                    if (complainToUpdate.Category == null || complainToUpdate.CategoryId == 0)
                     {
                         serviceResponse.Message = "Please Select a Category";
                         serviceResponse.Success = false;

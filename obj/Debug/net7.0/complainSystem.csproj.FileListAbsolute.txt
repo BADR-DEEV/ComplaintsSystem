@@ -84,3 +84,6 @@ C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsof
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsoft.Extensions.Identity.Core.dll
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsoft.Extensions.Identity.Stores.dll
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\FluentValidation.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\FluentValidation.AspNetCore.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\FluentValidation.DependencyInjectionExtensions.dll
