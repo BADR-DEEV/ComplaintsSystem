@@ -33,11 +33,8 @@ namespace complainSystem.Services.ComplainService
             //Validating the request before adding the complaint
             //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             var validationResult = new AddComplainDtoValidation().Validate(complaint);
-            var IsValid = validationResult.IsValid;
-            var Errors = validationResult.Errors;
-
-            ReqguestValidationGeneric<Complain> req = new(IsValid, complaint, Errors);
-            if (!IsValid)
+            ReqguestValidationGeneric<Complain> req = new(validationResult.IsValid, complaint, validationResult.Errors);
+            if (!validationResult.IsValid)
             {
                 req.serviceResponse.StatusCode = 400;
                 req.serviceResponse.Success = false;

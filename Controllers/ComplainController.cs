@@ -1,15 +1,18 @@
+using System.Security.Claims;
 using complainSystem.Helpers;
 using complainSystem.models;
 using complainSystem.models.ComplainDto;
 using complainSystem.models.Complains;
 using complainSystem.Services.ComplainService;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace complainSystem.Controllers
 {
+    [Authorize (Roles = "Admin, User")]
     [ApiController]
     [Route("api/[controller]")]
+
     public class ComplainController : ControllerBase
     {
         public IComplainService _complainService { get; }
@@ -20,8 +23,11 @@ namespace complainSystem.Controllers
 
         [HttpGet]
         [Route("GetAllComplains")]
+
         public async Task<ActionResult<ServiceResponse<List<Complain>>>> GetAllComplains()
         {
+
+
             Helpers<List<Complain>> helper = new();
             return helper.HandleResponse(await _complainService.GetComplaints());
         }

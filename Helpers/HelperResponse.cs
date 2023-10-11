@@ -21,6 +21,8 @@ namespace complainSystem.Helpers
                     return BadRequest(response);
                 case 200:
                     return Ok(response);
+                case 201:
+                    return Created("", response);
                 case 404:
                     return NotFound(response);
 
@@ -29,7 +31,7 @@ namespace complainSystem.Helpers
             }
         }
 
-        
+
 
     }
 }

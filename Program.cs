@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 using complainSystem.models.Users;
 using complainSystem.Services.AuthenticationService;
 using complainSystem.Services.ComplainService;
@@ -8,10 +10,11 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 
-
 // using ComplainSystem.Services.CategoryService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +23,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = """Standard Authorization header using the Bearer scheme. Example. "bearer {Token}" """,
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    c.OperationFilter<SecurityRequirementsOperationFilter>();
+
+});
 builder.Services.AddDbContext<DataContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
@@ -44,22 +58,41 @@ builder.Services.AddAuthentication(opt =>
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+
 }).AddJwtBearer(opt =>
 {
+    opt.SaveToken = true;
+    // opt.Authority = builder.Configuration.GetSection("Jwt:Issuer").Value;
+    // opt.Audience = builder.Configuration.GetSection("Jwt:Audience").Value;
+
     opt.TokenValidationParameters = new TokenValidationParameters()
     {
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.NameIdentifier,
         ValidateActor = true,
         ValidateIssuer = true,
         ValidateAudience = true,
         RequireExpirationTime = true,
         // ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
-        // IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        
+        
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"])),
+        
+
+        ValidIssuer = builder.Configuration.GetSection("AppSettings:Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("AppSettings:Audience").Value,
+
     };
 }
+
 );
+
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("User", policy => policy.RequireClaim("User"));
+// });
+
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<ICategoryService, CategoryService>();

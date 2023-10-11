@@ -20,9 +20,10 @@ namespace complainSystem
             CreateMap<Complain, UpdateComplainDto>();
             CreateMap<UpdateComplainDto, Complain>();
             CreateMap<AddComplainDto, Complain>();
-            CreateMap<UserRegister, User>();
-            CreateMap<User, UserRegister>();
-
+            CreateMap<UserRegisterDto, User>();
+            CreateMap<User, UserRegisterDto>();
+            CreateMap<UserLoginDto, User>();
+            CreateMap<User, UserLoginDto>();
 
             // CreateMap<UpdateCharacterDto, Character>();
         }

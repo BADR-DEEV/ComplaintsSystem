@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using complainSystem.models;
 using complainSystem.models.Users;
+using complainSystem.Validations;
 using ComplainSystem.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -22,23 +23,35 @@ namespace complainSystem.Services.AuthenticationService
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<SymmetricSecurityKey> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         ServiceResponse<User> serviceResponse = new ServiceResponse<User>();
 
         public AuthenticateUserService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
-         SignInManager<User> signInManager, IMapper mapper, IConfiguration configuration)
+         SignInManager<User> signInManager, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
-        public async Task<ServiceResponse<User>> RegisterUser(UserRegister registerDto, string role)
+        public async Task<ServiceResponse<User>> RegisterUser(UserRegisterDto registerDto, string role)
         {
+
+            var validationResult = new UserRegisterValidation().Validate(registerDto);
+            var mapped = _mapper.Map<User>(registerDto);
+            ReqguestValidationGeneric<User> req = new(validationResult.IsValid, mapped, validationResult.Errors);
+            if (!validationResult.IsValid)
+            {
+                req.serviceResponse!.StatusCode = 400;
+                req.serviceResponse.Success = false;
+                return req.serviceResponse;
+            }
+
             try
             {
                 User? userExist = await _userManager.FindByEmailAsync(registerDto.Email);
@@ -106,42 +119,46 @@ namespace complainSystem.Services.AuthenticationService
 
 
 
-        public async Task<ServiceResponse<User>> LoginUser(UserLogin userlogin)
+        public async Task<ServiceResponse<User>> LoginUser(UserLoginDto userlogin)
         {
+            var validationResult = new UserLoginValidation().Validate(userlogin);
+            var mapped = _mapper.Map<User>(userlogin);
+            ReqguestValidationGeneric<User> req = new(validationResult.IsValid, mapped, validationResult.Errors);
+            if (!validationResult.IsValid)
+            {
+                req.serviceResponse!.StatusCode = 400;
+                req.serviceResponse.Success = false;
+                serviceResponse.Message = "Validation Error";
+                return req.serviceResponse;
+            }
             try
             {
-                var userExist = await _userManager.FindByEmailAsync(userlogin.Email);
+                User? userExist = await _userManager.FindByEmailAsync(userlogin.Email);
                 if (userExist == null)
                 {
                     serviceResponse.Message = "User does not exist";
                     serviceResponse.Success = false;
-                    serviceResponse.StatusCode = 400;
+                    serviceResponse.StatusCode = 404;
                     return serviceResponse;
                 }
                 else
                 {
-                    // var result = _userManager.CheckPasswordAsync(userExist.Result, userlogin.Password);
                     var result = await _signInManager.PasswordSignInAsync(userlogin.Email, userlogin.Password, false, false);
 
                     if (result.Succeeded && userlogin.Email == userExist.Email)
                     {
-                        var token = RefreshToken(userlogin);
-
-
+                        var token = RefreshToken(mapped);
                         serviceResponse.Data = userExist;
                         serviceResponse.Message = "User login successfully";
-                        serviceResponse.Token = token;
+                        serviceResponse.access_token = token;
                         serviceResponse.Success = true;
                         serviceResponse.StatusCode = 200;
                         return serviceResponse;
-                        // serviceResponse.Message = token;
-                        // serviceResponse.Success = true;
-                        // serviceResponse.StatusCode = 200;
-                        // return serviceResponse;
                     }
                     else
                     {
-                        serviceResponse.Message = "User login failed";
+                        serviceResponse.Data = userExist;
+                        serviceResponse.Message = "User login failed  password in incorrect";
                         serviceResponse.Success = false;
                         serviceResponse.StatusCode = 400;
                         return serviceResponse;
@@ -162,26 +179,43 @@ namespace complainSystem.Services.AuthenticationService
             throw new NotImplementedException();
         }
 
-        public string RefreshToken(UserLogin user)
+        public string RefreshToken(User user)
         {
-            List<Claim> claims = new List<Claim>{
-                new(ClaimTypes.Email, user.Email ),
-                new(ClaimTypes.Role, "User" ),
-            };
-            var Security = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+            var Security = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value ?? "some default key"));
             SigningCredentials credentials = new SigningCredentials(Security, SecurityAlgorithms.HmacSha256Signature);
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Email!),
+                new Claim(ClaimTypes.Role , "User")
+                // new Claim("Role", role),
+
+            };
 
             SecurityToken securityToken = new JwtSecurityToken(
-
                 claims: claims,
+
                 issuer: _configuration.GetSection("AppSettings:Issuer").Value,
                 audience: _configuration.GetSection("AppSettings:Audience").Value,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: credentials
             );
 
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials,
+                Issuer = _configuration.GetSection("AppSettings:Issuer").Value,
+                Audience = _configuration.GetSection("AppSettings:Audience").Value,
+                
 
-            string tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
+
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenString;
 
 

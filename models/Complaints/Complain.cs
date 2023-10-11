@@ -25,8 +25,8 @@ namespace complainSystem.models.Complains
         [ForeignKey("CategoryId")]
         public int CategoryId { get; set; }
 
-        [ForeignKey("UserId")]
-        public int UserId { get; set; }
+        // [ForeignKey("UserId")]
+        // public int UserId { get; set; }
 
         // public string ComplainPriority { get; set; }
         // public string? ComplainImage { get; set; }

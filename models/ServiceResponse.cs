@@ -13,7 +13,7 @@ namespace complainSystem.models
         public string Message { get; set; } =string.Empty;
         public bool Success { get; set; } = true;
         public List<string>? ValidationMessages { get; set; } = new List<string>();
-        public string? Token { get; set; }
+        public string? access_token { get; set; }
         
         // public Exception Exception { get; set; }
         // public bool IsError { get; set; }

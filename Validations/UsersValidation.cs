@@ -7,24 +7,25 @@ using FluentValidation;
 
 namespace complainSystem.Validations
 {
-    public class UsersValidation : AbstractValidator<UserLogin>
-    {
-        public UsersValidation()
-        {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email is required");
-            RuleFor(x => x.Password).NotEmpty().MinimumLength(6).WithMessage("Password is required");
-        }
-        
-    }
 
-    public class UserRegisterValidation : AbstractValidator<UserRegister>
+    public class UserRegisterValidation : AbstractValidator<UserRegisterDto>
     {
         public UserRegisterValidation()
         {
             RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email is required");
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6).WithMessage("Password is required");
-            RuleFor(x => x.PhoneNumber).NotEmpty().MinimumLength(10).WithMessage("Phone Number is required");
+            RuleFor(x => x.PhoneNumber).NotEmpty().MinimumLength(8).WithMessage("Phone Number is required");
         }
-        
+
+    }
+
+    public class UserLoginValidation : AbstractValidator<UserLoginDto>
+    {
+        public UserLoginValidation()
+        {
+            RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email is required").NotNull();
+            RuleFor(x => x.Password).NotEmpty().MinimumLength(6).WithMessage("Password is required").Length(6, 100).NotNull();
+        }
+
     }
 }
