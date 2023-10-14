@@ -186,20 +186,20 @@ namespace complainSystem.Services.AuthenticationService
             SigningCredentials credentials = new SigningCredentials(Security, SecurityAlgorithms.HmacSha256Signature);
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Email!),
-                new Claim(ClaimTypes.Role , "User")
-                // new Claim("Role", role),
+                new Claim(ClaimTypes.NameIdentifier, user.Id!),
+                new Claim(ClaimTypes.Role , "User"),
+                new Claim(ClaimTypes.Email, user.Email!),
 
             };
 
-            SecurityToken securityToken = new JwtSecurityToken(
-                claims: claims,
+            // SecurityToken securityToken = new JwtSecurityToken(
+            //     claims: claims,
 
-                issuer: _configuration.GetSection("AppSettings:Issuer").Value,
-                audience: _configuration.GetSection("AppSettings:Audience").Value,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
-            );
+            //     issuer: _configuration.GetSection("AppSettings:Issuer").Value,
+            //     audience: _configuration.GetSection("AppSettings:Audience").Value,
+            //     expires: DateTime.Now.AddMinutes(30),
+            //     signingCredentials: credentials
+            // );
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

@@ -8,35 +8,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace complainSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class UserRegisterAuth : Migration
+    public partial class initiate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "UserId",
-                table: "Complains",
-                type: "nvarchar(450)",
-                nullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Categories",
-                type: "nvarchar(100)",
-                maxLength: 100,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Categories",
-                type: "nvarchar(500)",
-                maxLength: 500,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -56,7 +32,7 @@ namespace complainSystem.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -80,6 +56,36 @@ namespace complainSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,36 +194,54 @@ namespace complainSystem.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Complains",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ComplainTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ComplainDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ComplainDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ComplainStatus = table.Column<int>(type: "int", nullable: false),
+                    PersonUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Complains", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Complains_AspNetUsers_PersonUserId",
+                        column: x => x.PersonUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Complains_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "13e0c2c1-e9d3-4f9c-8271-f287989a20f3", "3", "SuperAdmin", "SUPERADMIN" },
-                    { "39d3e1d3-07d7-45ae-bb9a-d3c6cf5fe123", "2", "User", "USER" },
-                    { "f03bfa04-590e-4c97-a3b4-158a947254b0", "1", "Admin", "ADMIN" }
+                    { "05b6cf84-fa54-4fff-a02f-1e822bc1edcb", "2", "User", "USER" },
+                    { "7e53b965-a250-4da0-a467-eb1cda79c8ee", "1", "Admin", "ADMIN" },
+                    { "cbaaa6b9-4b83-4802-b7d2-8abb5a96cb5f", "3", "SuperAdmin", "SUPERADMIN" }
                 });
-
-            migrationBuilder.UpdateData(
-                table: "Complains",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "ComplainDateTime", "UserId" },
-                values: new object[] { new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6829), null });
 
             migrationBuilder.InsertData(
-                table: "Complains",
-                columns: new[] { "Id", "CategoryId", "ComplainDateTime", "ComplainDescription", "ComplainStatus", "ComplainTitle", "UserId" },
+                table: "Categories",
+                columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { 2, 2, new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6832), "someone stole my bike", 1, "Harrasment", null },
-                    { 3, 3, new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6834), "someone stole my bike", 1, "assult", null }
+                    { 1, "Theft is the taking of another person's property or services without that person's permission or consent with the intent to deprive the rightful owner of it.", "Theft" },
+                    { 2, "Harassment covers a wide range of behaviors of an offensive nature. It is commonly understood as behavior that demeans, humiliates or embarrasses a person, and it is characteristically identified by its unlikelihood in terms of social and moral reasonableness.", "Harrasment" },
+                    { 3, "Assault is an act of inflicting physical harm or unwanted physical contact upon a person or, in some specific legal definitions, a threat or attempt to commit such an action.", "assult" }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Complains_UserId",
-                table: "Complains",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -258,21 +282,20 @@ namespace complainSystem.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Complains_AspNetUsers_UserId",
+            migrationBuilder.CreateIndex(
+                name: "IX_Complains_CategoryId",
                 table: "Complains",
-                column: "UserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Complains_PersonUserId",
+                table: "Complains",
+                column: "PersonUserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Complains_AspNetUsers_UserId",
-                table: "Complains");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -289,55 +312,19 @@ namespace complainSystem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Complains");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Complains_UserId",
-                table: "Complains");
-
-            migrationBuilder.DeleteData(
-                table: "Complains",
-                keyColumn: "Id",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "Complains",
-                keyColumn: "Id",
-                keyValue: 3);
-
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "Complains");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Categories",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Categories",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(500)",
-                oldMaxLength: 500,
-                oldNullable: true);
-
-            migrationBuilder.UpdateData(
-                table: "Complains",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "ComplainDateTime",
-                value: new DateTime(2023, 10, 5, 17, 58, 5, 758, DateTimeKind.Local).AddTicks(7925));
+            migrationBuilder.DropTable(
+                name: "Categories");
         }
     }
 }

@@ -90,3 +90,7 @@ C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\FluentVa
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Scrutor.dll
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Swashbuckle.AspNetCore.Filters.dll
 C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\bader\Desktop\ComplainSecurity\complainSystem\bin\Debug\net7.0\Newtonsoft.Json.Bson.dll

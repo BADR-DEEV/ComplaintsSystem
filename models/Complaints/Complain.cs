@@ -19,14 +19,14 @@ namespace complainSystem.models.Complains
         public string ComplainDescription { get; set; } = string.Empty;
         public DateTime ComplainDateTime { get; set; } = DateTime.Now;
         public ComplainStatus ComplainStatus { get; set; } = ComplainStatus.Open;
-        public Category? Category { get; set; }
-        public User? User { get; set; }
+        
 
-        [ForeignKey("CategoryId")]
+        public User? PersonUser { get; set; }
+
+        [ForeignKey("Category")]
         public int CategoryId { get; set; }
+        public virtual Category? Category { get; set; }
 
-        // [ForeignKey("UserId")]
-        // public int UserId { get; set; }
 
         // public string ComplainPriority { get; set; }
         // public string? ComplainImage { get; set; }

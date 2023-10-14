@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 using complainSystem.models.Users;
 using complainSystem.Services.AuthenticationService;
 using complainSystem.Services.ComplainService;
@@ -20,7 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -75,10 +77,10 @@ builder.Services.AddAuthentication(opt =>
         RequireExpirationTime = true,
         // ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        
-        
+
+
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"])),
-        
+
 
         ValidIssuer = builder.Configuration.GetSection("AppSettings:Issuer").Value,
         ValidAudience = builder.Configuration.GetSection("AppSettings:Audience").Value,

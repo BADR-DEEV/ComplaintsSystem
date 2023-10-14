@@ -24,6 +24,9 @@ namespace complainSystem
             CreateMap<User, UserRegisterDto>();
             CreateMap<UserLoginDto, User>();
             CreateMap<User, UserLoginDto>();
+            CreateMap<User , PersonUserDto>();
+            CreateMap<PersonUserDto , User>();
+   
 
             // CreateMap<UpdateCharacterDto, Character>();
         }

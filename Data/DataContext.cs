@@ -24,56 +24,64 @@ namespace ComplainSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<IdentityUser>().Ignore(c => c.AccessFailedCount)
-                                               .Ignore(c => c.LockoutEnabled)
-                                               .Ignore(c => c.NormalizedEmail).
-                                               Ignore(c => c.NormalizedUserName)
-                                               .Ignore(c => c.PhoneNumberConfirmed)
-                                               .Ignore(c => c.TwoFactorEnabled)
-                                               .Ignore(c => c.ConcurrencyStamp)
-                                               .Ignore(c => c.EmailConfirmed)
-                                               .Ignore(c => c.LockoutEnd).Ignore(c => c.PasswordHash)
-                                               .Ignore(c => c.SecurityStamp).Ignore(c => c.PhoneNumber);
+          
+            modelBuilder.Entity<IdentityUser>()
+
+                .Ignore(c => c.AccessFailedCount)
+                .Ignore(c => c.LockoutEnabled)
+                .Ignore(c => c.TwoFactorEnabled)
+                .Ignore(c => c.ConcurrencyStamp)
+                .Ignore(c => c.LockoutEnd)
+                .Ignore(c => c.EmailConfirmed)
+                .Ignore(c => c.TwoFactorEnabled)
+                .Ignore(c => c.LockoutEnd)
+                .Ignore(c => c.AccessFailedCount)
+                .Ignore(c => c.PhoneNumberConfirmed)
+                .Ignore(c => c.NormalizedEmail)
+                .Ignore(c => c.PhoneNumber);
+
+
 
             modelBuilder.Entity<IdentityUser>().ToTable("Users");
-            modelBuilder.Entity<Complain>(entity =>
-            {
-                entity.HasData(new Complain
-                {
-                    Id = 1,
-                    ComplainTitle = "Theft",
-                    ComplainDescription = "someone stole my bike",
-                    ComplainDateTime = DateTime.Now,
-                    ComplainStatus = ComplainStatus.Open,
-                    CategoryId = 1
 
-                    // more properties of User
-                },
-                new Complain
-                {
-                    Id = 2,
-                    ComplainTitle = "Harrasment",
-                    ComplainDescription = "someone stole my bike",
-                    ComplainDateTime = DateTime.Now,
-                    ComplainStatus = ComplainStatus.Open,
-                    CategoryId = 2
+            // modelBuilder.Entity<Complain>(entity =>
+            // {
+            //     entity.HasData(new Complain
+            //     {
+            //         Id = 1,
+            //         ComplainTitle = "Theft",
+            //         ComplainDescription = "someone stole my bike",
+            //         ComplainDateTime = DateTime.Now,
+            //         ComplainStatus = ComplainStatus.Open,
+            //         CategoryId = 1
 
-                },
+            //         // more properties of User
+            //     },
+            //     new Complain
+            //     {
+            //         Id = 2,
+            //         ComplainTitle = "Harrasment",
+            //         ComplainDescription = "someone stole my bike",
+            //         ComplainDateTime = DateTime.Now,
+            //         ComplainStatus = ComplainStatus.Open,
+            //         CategoryId = 2
 
-            new Complain
-            {
-                Id = 3,
-                ComplainTitle = "assult",
-                ComplainDescription = "someone stole my bike",
-                ComplainDateTime = DateTime.Now,
-                ComplainStatus = ComplainStatus.Open,
-                CategoryId = 3
+            //     },
 
-            }
-                );
+            // new Complain
+            // {
+            //     Id = 3,
+            //     ComplainTitle = "assult",
+            //     ComplainDescription = "someone stole my bike",
+            //     ComplainDateTime = DateTime.Now,
+            //     ComplainStatus = ComplainStatus.Open,
+            //     CategoryId = 3
 
-            }
-            );
+            // }
+            //     );
+
+            // }
+            // );
             modelBuilder.Entity<Category>().HasData(
                 new Category
                 {

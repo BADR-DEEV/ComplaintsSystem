@@ -16,7 +16,8 @@ using Microsoft.Extensions.Logging;
 
 namespace complainSystem.Controllers.AdminControllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [ApiController]
     public class AuthenticationController : Controller
     {
         private readonly IAuthenticateUserService _AuthenticateUserService;

@@ -93,21 +93,21 @@ namespace complainSystem.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "f03bfa04-590e-4c97-a3b4-158a947254b0",
+                            Id = "7e53b965-a250-4da0-a467-eb1cda79c8ee",
                             ConcurrencyStamp = "1",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "39d3e1d3-07d7-45ae-bb9a-d3c6cf5fe123",
+                            Id = "05b6cf84-fa54-4fff-a02f-1e822bc1edcb",
                             ConcurrencyStamp = "2",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "13e0c2c1-e9d3-4f9c-8271-f287989a20f3",
+                            Id = "cbaaa6b9-4b83-4802-b7d2-8abb5a96cb5f",
                             ConcurrencyStamp = "3",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
@@ -137,6 +137,31 @@ namespace complainSystem.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -236,56 +261,25 @@ namespace complainSystem.Migrations
 
                     b.Property<string>("ComplainDescription")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ComplainStatus")
                         .HasColumnType("int");
 
                     b.Property<string>("ComplainTitle")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("PersonUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PersonUserId");
 
                     b.ToTable("Complains");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryId = 1,
-                            ComplainDateTime = new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6829),
-                            ComplainDescription = "someone stole my bike",
-                            ComplainStatus = 1,
-                            ComplainTitle = "Theft"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CategoryId = 2,
-                            ComplainDateTime = new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6832),
-                            ComplainDescription = "someone stole my bike",
-                            ComplainStatus = 1,
-                            ComplainTitle = "Harrasment"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CategoryId = 3,
-                            ComplainDateTime = new DateTime(2023, 10, 7, 17, 39, 9, 747, DateTimeKind.Local).AddTicks(6834),
-                            ComplainDescription = "someone stole my bike",
-                            ComplainStatus = 1,
-                            ComplainTitle = "assult"
-                        });
                 });
 
             modelBuilder.Entity("complainSystem.models.Users.User", b =>
@@ -297,7 +291,6 @@ namespace complainSystem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
@@ -431,11 +424,13 @@ namespace complainSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("complainSystem.models.Users.User", null)
+                    b.HasOne("complainSystem.models.Users.User", "PersonUser")
                         .WithMany("Complaints")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("PersonUserId");
 
                     b.Navigation("Category");
+
+                    b.Navigation("PersonUser");
                 });
 
             modelBuilder.Entity("complainSystem.models.Users.User", b =>

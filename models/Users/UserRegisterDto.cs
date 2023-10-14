@@ -11,6 +11,7 @@ namespace complainSystem.models.Users
 {
     public class UserRegisterDto
     {
+
         [EmailAddress]
         public string? Email { get; set; } = string.Empty;
         [DataType(DataType.Password)]

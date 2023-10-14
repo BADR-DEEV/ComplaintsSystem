@@ -1,14 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 using AutoMapper;
 using complainSystem.models;
 using complainSystem.models.ComplainDto;
 using complainSystem.models.Complains;
+using complainSystem.models.Users;
 using complainSystem.Validations;
 using ComplainSystem.Data;
+using ComplainSystem.models;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace complainSystem.Services.ComplainService
@@ -17,11 +22,20 @@ namespace complainSystem.Services.ComplainService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private UserManager<User> _userManager;
 
-        public ComplainService(DataContext context, IMapper mappingDtos)
+        public ComplainService(DataContext context, IMapper mappingDtos, IHttpContextAccessor httpContextAccessor, UserManager<User> usermanager)
         {
             _mapper = mappingDtos;
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = usermanager;
+
+        }
+        private string GetUserId()
+        {
+            return _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Email) ?? "mew";
         }
 
         public async Task<ServiceResponse<Complain>> AddComplaint(AddComplainDto PostedComplaint)
@@ -45,25 +59,37 @@ namespace complainSystem.Services.ComplainService
             try
             {
 
-                if (PostedComplaint.CategoryId == null || PostedComplaint.CategoryId == 0)
+
+                var userId = GetUserId();
+
+
+
+
+
+
+                complaint.Category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == PostedComplaint.CategoryId);
+
+
+                if (complaint.Category == null || complaint.CategoryId == 0)
                 {
                     serviceResponse.Message = "Please Select a Category";
                     serviceResponse.Success = false;
                     serviceResponse.StatusCode = 400;
-
-
+                    return serviceResponse;
                 }
-                else
-                {
-                    await _context.Complains.AddAsync(complaint);
-                    await _context.SaveChangesAsync();
-                    serviceResponse.Data = complaint;
-                    complaint.Category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == complaint.CategoryId);
-                    serviceResponse.Message = "Complain added successfully";
-                    serviceResponse.Success = true;
-                    serviceResponse.StatusCode = 200;
+                var user = await _userManager.FindByEmailAsync(userId) ?? throw new Exception("User not found");
+                var foundUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
 
-                }
+                complaint.PersonUser = foundUser;
+                _context.Users.FirstOrDefault(u => u.Id == user.Id).Complaints.Add(complaint);
+                await _context.Complains.AddAsync(complaint);
+                await _context.SaveChangesAsync();
+                serviceResponse.Data = complaint;
+                serviceResponse.Message = "Complain added successfully ";
+                serviceResponse.Success = true;
+                serviceResponse.StatusCode = 200;
+
+
 
             }
             catch (Exception e)
@@ -114,9 +140,11 @@ namespace complainSystem.Services.ComplainService
 
             try
             {
+
                 serviceResponse.Data = await _context.Complains.Where(c => c.Id == id)
                               .Include(p => p.Category)
                               .FirstOrDefaultAsync();
+
 
                 if (serviceResponse.Data == null)
                 {
@@ -149,7 +177,8 @@ namespace complainSystem.Services.ComplainService
 
             try
             {
-                serviceResponse.Data = await _context.Complains.ToListAsync();
+                var x = await _userManager.FindByEmailAsync(GetUserId()) ?? throw new Exception("User not found");
+                serviceResponse.Data = await _context.Complains.Include(c => c.Category).ToListAsync();
 
                 if (serviceResponse.Data == null)
                 {

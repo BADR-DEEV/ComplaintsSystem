@@ -13,16 +13,16 @@ namespace complainSystem.Controllers
     [ApiController]
     [Route("api/[controller]")]
 
-    public class ComplainController : ControllerBase
+    public class ComplaintController : ControllerBase
     {
         public IComplainService _complainService { get; }
-        public ComplainController(IComplainService complainService)
+        public ComplaintController(IComplainService complainService)
         {
             _complainService = complainService;
         }
 
         [HttpGet]
-        [Route("GetAllComplains")]
+        [Route("GetComplaints")]
 
         public async Task<ActionResult<ServiceResponse<List<Complain>>>> GetAllComplains()
         {
@@ -33,7 +33,7 @@ namespace complainSystem.Controllers
         }
 
         [HttpGet]
-        [Route("GetComplain/{id}")]
+        [Route("GetComplaints/{id}")]
         public async Task<ActionResult<ServiceResponse<Complain>>> GetComplain(int id)
         {
             Helpers<Complain> helper = new();
@@ -41,7 +41,7 @@ namespace complainSystem.Controllers
         }
 
         [HttpDelete]
-        [Route("DeleteComplain/{id}")]
+        [Route("DeleteComplaint/{id}")]
         public async Task<ActionResult<ServiceResponse<Complain>>> DeleteComplain(int id)
         {
             Helpers<Complain> helper = new();
@@ -49,7 +49,7 @@ namespace complainSystem.Controllers
         }
 
         [HttpPost]
-        [Route("AddComplain")]
+        [Route("AddComplaint")]
         public async Task<ActionResult<ServiceResponse<Complain>>> AddComplain(AddComplainDto complain)
         {
             Helpers<Complain> helper = new();
@@ -57,7 +57,7 @@ namespace complainSystem.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateComplain/{id}")]
+        [Route("UpdateComplaint/{id}")]
         public async Task<ActionResult<ServiceResponse<Complain>>> UpdateComplain(UpdateComplainDto complain)
         {
             Helpers<Complain> helper = new();
